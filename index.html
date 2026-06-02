@@ -1,33 +1,34 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-<title>PunkForge</title>
+<title>Punk Revolver</title>
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/png" href="/favicon.png">
 <meta name="theme-color" content="#00ff00">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="PunkForge">
+<meta name="apple-mobile-web-app-title" content="Punk Revolver">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#000;color:#fff;font-family:monospace;padding:clamp(16px,4vw,24px);max-width:500px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;position:relative;overflow-x:hidden}
 body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,0,0.03) 2px,rgba(0,255,0,0.03) 4px);pointer-events:none;z-index:1000}
-h1{font-size:clamp(24px,6vw,32px);margin-bottom:4px;color:#0f0;text-align:center;text-shadow:0 0 20px rgba(0,255,0,0.5);letter-spacing:4px}
-.subtitle{color:#0f0;font-size:clamp(11px,2.5vw,13px);text-align:center;margin-bottom:clamp(16px,4vw,24px);opacity:0.7;letter-spacing:2px}
+h1{font-size:clamp(28px,7vw,36px);margin-bottom:4px;color:#0f0;text-align:center;text-shadow:0 0 30px rgba(0,255,0,0.6);letter-spacing:6px;font-weight:bold}
+.subtitle{color:#0f0;font-size:clamp(13px,3vw,16px);text-align:center;margin-bottom:clamp(20px,5vw,30px);opacity:0.8;letter-spacing:3px;font-weight:bold}
+.tagline{color:#0f0;font-size:clamp(11px,2.5vw,13px);text-align:center;margin-bottom:clamp(16px,4vw,24px);opacity:0.5;letter-spacing:1px;font-style:italic}
 .demo-section{margin:clamp(20px,5vw,30px) 0;text-align:center}
-.demo-grid{display:inline-block;position:relative}
-.demo-canvas{border:1px solid rgba(0,255,0,0.3);background:#000}
+.demo-canvas{border:1px solid rgba(0,255,0,0.3);background:#000;display:block;margin:0 auto}
 .demo-label{font-size:clamp(10px,2.5vw,12px);color:#0f0;opacity:0.5;margin-top:8px;letter-spacing:1px}
-.demo-arrow{display:flex;align-items:center;justify-content:center;margin:12px 0;color:#0f0;font-size:24px;opacity:0.5}
-.demo-text{font-size:clamp(11px,2.5vw,13px);color:#0f0;opacity:0.6;margin:16px 0;line-height:1.6}
-.demo-text span{color:#0f0;opacity:1}
+.manifesto{margin:clamp(24px,6vw,36px) 0;padding:clamp(16px,4vw,24px);border:1px solid rgba(0,255,0,0.2);border-radius:12px;background:rgba(0,255,0,0.03)}
+.manifesto-line{color:#0f0;font-size:clamp(14px,3.5vw,18px);line-height:1.8;opacity:0.9;margin-bottom:8px}
+.manifesto-line em{opacity:1;font-style:normal;text-shadow:0 0 10px rgba(0,255,0,0.5)}
+.manifesto-line.dim{opacity:0.4;font-size:clamp(12px,3vw,14px)}
 .how-it-works{margin:clamp(20px,5vw,30px) 0;display:flex;flex-direction:column;gap:16px}
 .step{display:flex;align-items:flex-start;gap:12px;text-align:left}
 .step-num{color:#0f0;font-size:clamp(20px,5vw,24px);font-weight:bold;min-width:30px;opacity:0.5}
 .step-text{color:#0f0;font-size:clamp(12px,3vw,14px);opacity:0.7;line-height:1.5}
 .step-text strong{opacity:1}
 .upload{border:2px dashed rgba(0,255,0,0.4);border-radius:16px;padding:clamp(24px,6vw,40px);text-align:center;cursor:pointer;margin-bottom:clamp(16px,4vw,24px);transition:all .3s;position:relative;overflow:hidden}
-.upload:hover{border-color:#0f0;background:rgba(0,255,0,0.05);box-shadow:0 0 30px rgba(0,255,0,0.1)}
+.upload:hover{border-color:#0f0;background:rgba(0,255,0,0.05);box-shadow:0 0 40px rgba(0,255,0,0.15)}
 .upload:active{border-color:#0f0;background:rgba(0,255,0,0.1)}
 .upload p{color:#0f0;font-size:clamp(14px,3.5vw,18px);opacity:0.8}
 .upload p span{color:#0f0;font-size:clamp(28px,7vw,36px);display:block;margin-bottom:8px;text-shadow:0 0 20px rgba(0,255,0,0.5)}
@@ -86,54 +87,57 @@ input[type=range]::-moz-range-thumb{width:clamp(24px,6vw,32px);height:clamp(24px
 .footer{text-align:center;margin-top:auto;padding:clamp(20px,5vw,30px) 0;color:#0f0;opacity:0.3;font-size:clamp(10px,2.5vw,12px);letter-spacing:1px}
 </style>
 </head><body>
-<h1>PUNKFORGE</h1>
-<p class="subtitle">PHOTO → PIXEL ART → ONCHAIN</p>
+<h1>PUNK REVOLVER</h1>
+<p class="subtitle">LOAD • AIM • FIRE • MINT</p>
+<p class="tagline">It revolves.</p>
+
+<div class="manifesto">
+  <div class="manifesto-line">You can't draw. <em>We don't care.</em></div>
+  <div class="manifesto-line">Upload any messy photo.</div>
+  <div class="manifesto-line">We strip it down.</div>
+  <div class="manifesto-line">Isolate the character.</div>
+  <div class="manifesto-line dim">Convert to crisp 24×24 pixel art.</div>
+  <div class="manifesto-line dim">No skills. No apps. No gatekeepers.</div>
+</div>
 
 <div class="demo-section">
   <canvas id="demoCanvas" class="demo-canvas" width="192" height="192"></canvas>
-  <div class="demo-label">24×24 • 120 PIXELS • 50 PTS</div>
-</div>
-
-<div class="demo-text">
-  Upload any <span>messy photo</span>.<br>
-  We <span>isolate the character</span>.<br>
-  You get <span>pixel art</span>.<br>
-  <span>No drawing skills needed.</span>
+  <div class="demo-label">EVERY PHOTO IS A BULLET</div>
 </div>
 
 <div class="how-it-works">
   <div class="step">
     <span class="step-num">01</span>
-    <span class="step-text"><strong>Upload</strong> any photo — messy, noisy, whatever</span>
+    <span class="step-text"><strong>LOAD</strong> — any photo, messy or clean</span>
   </div>
   <div class="step">
     <span class="step-num">02</span>
-    <span class="step-text"><strong>Isolate</strong> — we grab just the character</span>
+    <span class="step-text"><strong>AIM</strong> — we isolate the subject</span>
   </div>
   <div class="step">
     <span class="step-num">03</span>
-    <span class="step-text"><strong>Pixelate</strong> — crisp black & white art</span>
+    <span class="step-text"><strong>FIRE</strong> — crisp black & white pixel art</span>
   </div>
   <div class="step">
     <span class="step-num">04</span>
-    <span class="step-text"><strong>Mint</strong> — save onchain via Normie Punk Evolve</span>
+    <span class="step-text"><strong>MINT</strong> — save onchain, evolve forever</span>
   </div>
 </div>
 
 <div class="upload" id="uploadArea" onclick="document.getElementById('fileInput').click()">
-  <p><span>⬆</span>UPLOAD IMAGE</p>
+  <p><span>🔫</span>PULL THE TRIGGER</p>
 </div>
 <input type="file" id="fileInput" accept="image/*" style="display:none">
 
 <div id="editor" class="editor hidden">
-  <button class="new-upload" onclick="document.getElementById('fileInput').click()">⬆ NEW IMAGE</button>
+  <button class="new-upload" onclick="document.getElementById('fileInput').click()">🔫 RELOAD</button>
 
   <div class="section">
     <div class="section-title">PREVIEW</div>
     <div class="preview-container" id="previewContainer">
       <div class="preview-box" id="originalPreview">
         <img id="originalImg" src="" alt="Original">
-        <div class="preview-label">ORIGINAL</div>
+        <div class="preview-label">LOADED</div>
       </div>
       <div class="preview-box" id="isolatedPreview" style="display:none">
         <img id="isolatedImg" src="" alt="Isolated">
@@ -141,13 +145,13 @@ input[type=range]::-moz-range-thumb{width:clamp(24px,6vw,32px);height:clamp(24px
       </div>
       <div class="preview-box pixelated" id="pixelatedPreview">
         <canvas id="previewCanvas"></canvas>
-        <div class="preview-label">PIXELATED</div>
+        <div class="preview-label">FIRED</div>
       </div>
     </div>
   </div>
 
   <div class="section">
-    <div class="section-title">CANVAS SIZE</div>
+    <div class="section-title">CHAMBER SIZE</div>
     <div class="canvas-btns">
       <div class="canvas-btn on" data-size="24" onclick="setGridSize(24)">
         <span class="canvas-size">24×24</span>
@@ -170,8 +174,8 @@ input[type=range]::-moz-range-thumb{width:clamp(24px,6vw,32px);height:clamp(24px
   <div class="section">
     <div class="isolate-btn on" id="isolateBtn" onclick="toggleIsolate()">
       <span class="icon">✂</span>
-      <span class="label">ISOLATE CHARACTER</span>
-      <span class="desc">Remove background, keep only the subject</span>
+      <span class="label">ISOLATE TARGET</span>
+      <span class="desc">Strip the background, keep only the subject</span>
     </div>
     <div class="isolate-status" id="isolateStatus"></div>
   </div>
@@ -214,7 +218,7 @@ input[type=range]::-moz-range-thumb{width:clamp(24px,6vw,32px);height:clamp(24px
 <canvas id="srcCanvas" style="display:none"></canvas>
 <canvas id="isolatedCanvas" style="display:none"></canvas>
 
-<div class="footer">PUNKFORGE • NORMIE PUNK EVOLVE • BASE CHAIN</div>
+<div class="footer">PUNK REVOLVER • NORMIE PUNK EVOLVE • BASE CHAIN</div>
 
 <script>
 // Demo animation - draws a pixel skull
@@ -284,12 +288,12 @@ function drawDemo() {
       
       // Add glow to last pixel
       ctx.shadowColor = '#0f0';
-      ctx.shadowBlur = 10;
+      ctx.shadowBlur = 15;
       ctx.fillRect(p.x * SCALE, p.y * SCALE, SCALE, SCALE);
       ctx.shadowBlur = 0;
       
       currentPixel++;
-      setTimeout(animate, 30);
+      setTimeout(animate, 25);
     } else {
       // Animation complete - restart after delay
       setTimeout(() => {
@@ -411,7 +415,7 @@ async function isolateSubject() {
   if (!srcImageData || isIsolating || !removeBackgroundFn) return;
   
   isIsolating = true;
-  document.getElementById('isolateStatus').textContent = '⏳ ISOLATING...';
+  document.getElementById('isolateStatus').textContent = '⏳ ISOLATING TARGET...';
   document.getElementById('isolateBtn').style.opacity = '0.5';
   
   try {
@@ -435,7 +439,7 @@ async function isolateSubject() {
       
       isolatedImageData = ctx.getImageData(0, 0, img.width, img.height);
       isIsolating = false;
-      document.getElementById('isolateStatus').textContent = '✅ ISOLATED';
+      document.getElementById('isolateStatus').textContent = '✅ TARGET ACQUIRED';
       document.getElementById('isolateBtn').style.opacity = '1';
       
       showIsolatedPreview();
@@ -446,7 +450,7 @@ async function isolateSubject() {
   } catch (err) {
     console.error('Isolation failed:', err);
     isIsolating = false;
-    document.getElementById('isolateStatus').textContent = '❌ ISOLATION FAILED';
+    document.getElementById('isolateStatus').textContent = '❌ MISFIRE';
     document.getElementById('isolateBtn').style.opacity = '1';
     isolatedImageData = null;
     hideIsolatedPreview();
@@ -465,7 +469,7 @@ function getScale() {
 
 document.getElementById('fileInput').addEventListener('change', function(e) {
   if (!e.target.files[0]) return;
-  document.getElementById('uploadArea').innerHTML = '<p><span>⏳</span>PROCESSING...</p>';
+  document.getElementById('uploadArea').innerHTML = '<p><span>⏳</span>LOADING...</p>';
   document.getElementById('uploadArea').classList.add('loading');
   isolatedImageData = null;
   document.getElementById('isolateStatus').textContent = '';
@@ -487,10 +491,11 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
       document.getElementById('uploadArea').classList.remove('loading');
       document.getElementById('uploadArea').style.padding = 'clamp(12px,3vw,16px)';
       
-      // Hide demo section after upload
+      // Hide manifesto/demo after upload
+      document.querySelector('.manifesto').style.display = 'none';
       document.querySelector('.demo-section').style.display = 'none';
-      document.querySelector('.demo-text').style.display = 'none';
       document.querySelector('.how-it-works').style.display = 'none';
+      document.querySelector('.tagline').style.display = 'none';
       
       showOriginalPreview();
       
@@ -672,7 +677,7 @@ window.downloadPNG = function() {
     ctx.fillRect(pixels[i].gx, pixels[i].gy, 1, 1);
   }
   const a = document.createElement('a');
-  a.download = 'punkforge-' + GRID + 'x' + GRID + '.png';
+  a.download = 'punk-revolver-' + GRID + 'x' + GRID + '.png';
   a.href = c.toDataURL('image/png');
   a.click();
 }
@@ -692,7 +697,7 @@ window.downloadScaled = function() {
     ctx.fillRect(pixels[i].gx * S, pixels[i].gy * S, S, S);
   }
   const a = document.createElement('a');
-  a.download = 'punkforge-' + GRID + 'x' + GRID + '-8x.png';
+  a.download = 'punk-revolver-' + GRID + 'x' + GRID + '-8x.png';
   a.href = c.toDataURL('image/png');
   a.click();
 }
