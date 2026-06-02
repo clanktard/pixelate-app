@@ -20,7 +20,6 @@ h1{font-size:clamp(20px,5vw,28px);margin-bottom:4px;color:#0f0;text-align:center
 .upload p span{color:#0f0;font-size:clamp(28px,7vw,36px);display:block;margin-bottom:8px}
 .upload.loading{border-color:#0f0;animation:pulse 1.5s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
-canvas{display:none}
 .editor{flex:1;display:flex;flex-direction:column}
 .hidden{display:none}
 .section{margin-bottom:clamp(16px,4vw,20px)}
@@ -167,24 +166,40 @@ input[type=range]::-moz-range-thumb{width:clamp(24px,6vw,32px);height:clamp(24px
   </div>
 </div>
 
-<canvas id="srcCanvas"></canvas>
-<canvas id="isolatedCanvas"></canvas>
+<canvas id="srcCanvas" style="display:none"></canvas>
+<canvas id="isolatedCanvas" style="display:none"></canvas>
 
-<script type="module">
-import { removeBackground } from 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/+esm';
-
+<script>
+// Global variables
 let GRID = 24;
 let darkBudget = 120, contrast = 1.5, cropMargin = 1, invert = false, showGrid = false;
 let isolateCharacter = true;
 let srcImageData = null, srcW = 0, srcH = 0;
 let isolatedImageData = null;
 let isIsolating = false;
+let removeBackgroundFn = null;
 
 const SIZES = {
   24: { maxDark: 576, defaultDark: 120, points: 50 },
   64: { maxDark: 4096, defaultDark: 500, points: 400 },
   128: { maxDark: 16384, defaultDark: 2000, points: 2000 }
 };
+
+// Load background removal library asynchronously
+async function loadBackgroundRemoval() {
+  try {
+    const module = await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/+esm');
+    removeBackgroundFn = module.removeBackground;
+    console.log('✅ Background removal library loaded');
+    return true;
+  } catch (err) {
+    console.warn('⚠️ Background removal library failed to load:', err);
+    document.getElementById('isolateStatus').textContent = '⚠️ Isolation unavailable (library failed to load)';
+    document.getElementById('isolateBtn').style.opacity = '0.5';
+    document.getElementById('isolateBtn').style.pointerEvents = 'none';
+    return false;
+  }
+}
 
 // Show original preview
 function showOriginalPreview() {
@@ -228,6 +243,8 @@ window.toggleAdvanced = function() {
 }
 
 window.toggleIsolate = function() {
+  if (!removeBackgroundFn) return; // Can't toggle if library not loaded
+  
   isolateCharacter = !isolateCharacter;
   document.getElementById('isolateBtn').classList.toggle('on', isolateCharacter);
   
@@ -242,7 +259,7 @@ window.toggleIsolate = function() {
 }
 
 async function isolateSubject() {
-  if (!srcImageData || isIsolating) return;
+  if (!srcImageData || isIsolating || !removeBackgroundFn) return;
   
   isIsolating = true;
   document.getElementById('isolateStatus').textContent = '⏳ Isolating character... (first time may take 30s)';
@@ -252,7 +269,7 @@ async function isolateSubject() {
     const c = document.getElementById('srcCanvas');
     const blob = await new Promise(resolve => c.toBlob(resolve, 'image/png'));
     
-    const resultBlob = await removeBackground(blob);
+    const resultBlob = await removeBackgroundFn(blob);
     
     const img = new Image();
     const objUrl = URL.createObjectURL(resultBlob);
@@ -323,7 +340,7 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
       
       showOriginalPreview();
       
-      if (isolateCharacter) {
+      if (isolateCharacter && removeBackgroundFn) {
         await isolateSubject();
       } else {
         process();
@@ -525,6 +542,9 @@ window.downloadScaled = function() {
   a.href = c.toDataURL('image/png');
   a.click();
 }
+
+// Load background removal library on page load
+loadBackgroundRemoval();
 </script>
 <script>
 if ('serviceWorker' in navigator) {
