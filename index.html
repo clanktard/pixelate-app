@@ -593,10 +593,10 @@ function process() {
   previewCanvas.height = GRID * SCALE;
   const ctx = previewCanvas.getContext('2d');
   
-  ctx.fillStyle = invert ? '#fff' : '#000';
+  ctx.fillStyle = invert ? '#000' : '#fff';
   ctx.fillRect(0, 0, GRID * SCALE, GRID * SCALE);
   
-  ctx.fillStyle = invert ? '#000' : '#fff';
+  ctx.fillStyle = invert ? '#fff' : '#000';
   for (let y = 0; y < GRID; y++) {
     for (let x = 0; x < GRID; x++) {
       if (darkSet.has(y * GRID + x)) {
