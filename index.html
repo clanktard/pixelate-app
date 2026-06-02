@@ -22,7 +22,7 @@ canvas{display:none}
 label{display:block;font-size:clamp(11px,2.5vw,13px);color:#888;margin-bottom:4px}
 input[type=range]{width:100%;margin-bottom:clamp(10px,2.5vw,14px);height:28px;cursor:pointer;accent-color:#0f0}
 .val{color:#0f0;font-weight:bold}
-.row{display:flex;align-items:center;gap:clamp(6px,2vw,12px);margin-bottom:clamp(10px,2.5vw,14px)}
+.row{display:flex;align-items:center;gap:clamp(6px,2vw,12px);margin-bottom:clamp(10px,2.5vw,14px);flex-wrap:wrap}
 .toggle{background:#333;color:#fff;border:1px solid #555;border-radius:6px;padding:clamp(6px,1.5vw,10px) clamp(10px,2.5vw,16px);font-family:monospace;cursor:pointer;font-size:clamp(12px,2.8vw,14px);transition:all .2s}
 .toggle.on{background:#0f0;color:#000}
 .preview{text-align:center;margin:clamp(12px,3vw,20px) 0}
@@ -32,6 +32,11 @@ input[type=range]{width:100%;margin-bottom:clamp(10px,2.5vw,14px);height:28px;cu
 .btn{background:#0f0;color:#000;border:none;border-radius:8px;padding:clamp(8px,2vw,12px) clamp(12px,3vw,18px);font-family:monospace;font-weight:bold;cursor:pointer;font-size:clamp(12px,2.8vw,14px);transition:opacity .2s;flex:1;min-width:120px;text-align:center}
 .btn:active{opacity:0.7}
 .hidden{display:none}
+.size-btns{display:flex;gap:8px;margin-bottom:clamp(10px,2.5vw,14px)}
+.size-btn{background:#222;color:#888;border:1px solid #444;border-radius:6px;padding:8px 12px;font-family:monospace;cursor:pointer;font-size:13px;flex:1;text-align:center;transition:all .2s}
+.size-btn:hover{border-color:#0f0;color:#0f0}
+.size-btn.on{background:#0f0;color:#000;border-color:#0f0;font-weight:bold}
+.points{font-size:11px;color:#666;margin-top:2px}
 @media(min-width:500px){
   .btn{min-width:160px}
 }
@@ -46,6 +51,13 @@ input[type=range]{width:100%;margin-bottom:clamp(10px,2.5vw,14px);height:28px;cu
 
 <div id="editor" class="hidden">
   <div class="controls">
+    <label>Canvas Size</label>
+    <div class="size-btns">
+      <button class="size-btn on" data-size="24" onclick="setGridSize(24)">24×24<span class="points">50 pts</span></button>
+      <button class="size-btn" data-size="64" onclick="setGridSize(64)">64×64<span class="points">400 pts</span></button>
+      <button class="size-btn" data-size="128" onclick="setGridSize(128)">128×128<span class="points">2000 pts</span></button>
+    </div>
+    
     <label>Dark Points: <span class="val" id="darkVal">120</span></label>
     <input type="range" id="darkSlider" min="10" max="300" step="10" value="120">
     
@@ -66,7 +78,7 @@ input[type=range]{width:100%;margin-bottom:clamp(10px,2.5vw,14px);height:28px;cu
   <div class="preview" id="preview"></div>
   
   <div class="btns">
-    <button class="btn" onclick="downloadPNG()">⬇ PNG (24×24)</button>
+    <button class="btn" onclick="downloadPNG()">⬇ PNG</button>
     <button class="btn" onclick="downloadScaled()">⬇ PNG (8×)</button>
   </div>
 </div>
@@ -74,16 +86,44 @@ input[type=range]{width:100%;margin-bottom:clamp(10px,2.5vw,14px);height:28px;cu
 <canvas id="srcCanvas"></canvas>
 
 <script>
-const GRID = 24;
+let GRID = 24;
 let darkBudget = 120, contrast = 1.5, cropMargin = 1, invert = false, showGrid = false;
 let srcImageData = null, srcW = 0, srcH = 0;
+
+// Canvas size configs (matching Normie Punk Evolve)
+const SIZES = {
+  24: { maxDark: 576, defaultDark: 120, points: 50 },
+  64: { maxDark: 4096, defaultDark: 500, points: 400 },
+  128: { maxDark: 16384, defaultDark: 2000, points: 2000 }
+};
+
+function setGridSize(size) {
+  GRID = size;
+  const cfg = SIZES[size];
+  
+  // Update dark budget slider
+  const slider = document.getElementById('darkSlider');
+  slider.max = cfg.maxDark;
+  slider.value = cfg.defaultDark;
+  darkBudget = cfg.defaultDark;
+  document.getElementById('darkVal').textContent = darkBudget;
+  
+  // Update active button
+  document.querySelectorAll('.size-btn').forEach(btn => {
+    btn.classList.toggle('on', parseInt(btn.dataset.size) === size);
+  });
+  
+  process();
+}
 
 function getScale() {
   const container = document.querySelector('.preview');
   if (!container) return 12;
   const maxW = container.clientWidth - 4;
-  const s = Math.floor(maxW / GRID);
-  return Math.max(4, Math.min(20, s));
+  // For larger canvases, use smaller scale
+  if (GRID <= 24) return Math.max(4, Math.min(20, Math.floor(maxW / GRID)));
+  if (GRID <= 64) return Math.max(2, Math.min(8, Math.floor(maxW / GRID)));
+  return Math.max(1, Math.min(4, Math.floor(maxW / GRID)));
 }
 
 document.getElementById('fileInput').addEventListener('change', function(e) {
@@ -206,8 +246,8 @@ function process() {
     }
   }
   
-  // Grid
-  if (showGrid) {
+  // Grid (only show for smaller canvases)
+  if (showGrid && GRID <= 64) {
     ctx.strokeStyle = invert ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)';
     ctx.lineWidth = 0.5;
     for (let i = 0; i <= GRID; i++) {
@@ -222,7 +262,8 @@ function process() {
   
   // Stats
   const pct = ((darkSet.size / (GRID * GRID)) * 100).toFixed(1);
-  document.getElementById('stats').textContent = GRID + '×' + GRID + ' | ' + darkSet.size + '/' + (GRID*GRID) + ' pixels (' + pct + '%)';
+  const pts = SIZES[GRID].points;
+  document.getElementById('stats').textContent = GRID + '×' + GRID + ' | ' + darkSet.size + '/' + (GRID*GRID) + ' pixels (' + pct + '%) | ' + pts + ' pts';
 }
 
 // Re-render on resize
@@ -273,7 +314,7 @@ function downloadPNG() {
     ctx.fillRect(pixels[i].gx, pixels[i].gy, 1, 1);
   }
   const a = document.createElement('a');
-  a.download = 'pixel-24x24.png';
+  a.download = 'pixel-' + GRID + 'x' + GRID + '.png';
   a.href = c.toDataURL('image/png');
   a.click();
 }
@@ -320,7 +361,7 @@ function downloadScaled() {
     ctx.fillRect(pixels[i].gx * S, pixels[i].gy * S, S, S);
   }
   const a = document.createElement('a');
-  a.download = 'pixel-192x192.png';
+  a.download = 'pixel-' + GRID + 'x' + GRID + '-8x.png';
   a.href = c.toDataURL('image/png');
   a.click();
 }
