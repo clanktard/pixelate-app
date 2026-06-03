@@ -687,10 +687,12 @@ function process() {
   // Sort by shapeScore (most defining features first), fill up to budget
   cellScores.sort((a, b) => b.shapeScore - a.shapeScore);
   const darkSet = new Set();
-  const shapeThreshold = 0.05; // Skip cells with near-zero shape score (dead color)
+  const shapeThreshold = 0.15; // Higher threshold — only cells with real contour
+  const minEdgeDensity = 8; // Minimum edge density to count as "shape"
   for (let i = 0; i < cellScores.length && darkSet.size < darkBudget; i++) {
-    if (cellScores[i].shapeScore >= shapeThreshold) {
-      darkSet.add(cellScores[i].gy * GRID + cellScores[i].gx);
+    const c = cellScores[i];
+    if (c.shapeScore >= shapeThreshold && c.edgeDensity >= minEdgeDensity) {
+      darkSet.add(c.gy * GRID + c.gx);
     }
   }
   
@@ -844,12 +846,12 @@ function getProcessPixels() {
       const edgeWeight = Math.min(edgeDensity / 60, 1);
       const shapeScore = edgeWeight * 0.65 + normalizedVar * 0.2 + darkRatio * 0.15;
 
-      cellScores.push({ gx, gy, gray: meanGray, shapeScore });
+      cellScores.push({ gx, gy, gray: meanGray, shapeScore, edgeDensity });
     }
   }
 
   cellScores.sort((a, b) => b.shapeScore - a.shapeScore);
-  return cellScores.filter(c => c.shapeScore >= 0.05);
+  return cellScores.filter(c => c.shapeScore >= 0.15 && c.edgeDensity >= 8);
 }
 
 window.downloadPNG = function() {
