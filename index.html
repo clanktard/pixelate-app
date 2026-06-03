@@ -543,20 +543,56 @@ function process() {
   const activeData = (isolateCharacter && isolatedImageData) ? isolatedImageData : srcImageData;
   const activeW = activeData.width;
   const activeH = activeData.height;
-  
-  let minX = activeW, minY = activeH, maxX = 0, maxY = 0;
   const d = activeData.data;
+  
+  // Smart auto-crop: detect subject using alpha channel or adaptive threshold
+  let minX = activeW, minY = activeH, maxX = 0, maxY = 0;
+  let hasAlpha = false;
+  let totalPixels = activeW * activeH;
+  let darkPixels = 0;
+  
+  // First pass: check for alpha channel and count dark pixels
   for (let y = 0; y < activeH; y++) {
     for (let x = 0; x < activeW; x++) {
       const i = (y * activeW + x) * 4;
+      const alpha = d[i + 3];
       const gray = d[i] * 0.299 + d[i+1] * 0.587 + d[i+2] * 0.114;
-      if (gray < 200) {
+      
+      if (alpha < 255) hasAlpha = true;
+      if (gray < 200) darkPixels++;
+    }
+  }
+  
+  // Second pass: find subject boundaries
+  for (let y = 0; y < activeH; y++) {
+    for (let x = 0; x < activeW; x++) {
+      const i = (y * activeW + x) * 4;
+      const alpha = d[i + 3];
+      const gray = d[i] * 0.299 + d[i+1] * 0.587 + d[i+2] * 0.114;
+      
+      // Use alpha if available, otherwise use adaptive threshold
+      let isSubject = false;
+      if (hasAlpha) {
+        isSubject = alpha > 128; // Non-transparent pixels
+      } else {
+        // Adaptive: use median-ish threshold based on image content
+        const threshold = darkPixels > totalPixels * 0.5 ? 180 : 200;
+        isSubject = gray < threshold;
+      }
+      
+      if (isSubject) {
         if (x < minX) minX = x;
         if (y < minY) minY = y;
         if (x > maxX) maxX = x;
         if (y > maxY) maxY = y;
       }
     }
+  }
+  
+  // If no subject found (all white/transparent), use full image
+  if (minX >= maxX || minY >= maxY) {
+    minX = 0; minY = 0;
+    maxX = activeW - 1; maxY = activeH - 1;
   }
   
   minX = Math.max(0, minX - cropMargin);
@@ -634,17 +670,39 @@ function getProcessPixels() {
   const activeH = activeData.height;
   const d = activeData.data;
   
+  // Same smart auto-crop as process()
   let minX = activeW, minY = activeH, maxX = 0, maxY = 0;
+  let hasAlpha = false;
+  let totalPixels = activeW * activeH;
+  let darkPixels = 0;
+  
   for (let y = 0; y < activeH; y++) {
     for (let x = 0; x < activeW; x++) {
       const i = (y * activeW + x) * 4;
+      if (d[i + 3] < 255) hasAlpha = true;
       const gray = d[i] * 0.299 + d[i+1] * 0.587 + d[i+2] * 0.114;
-      if (gray < 200) {
+      if (gray < 200) darkPixels++;
+    }
+  }
+  
+  for (let y = 0; y < activeH; y++) {
+    for (let x = 0; x < activeW; x++) {
+      const i = (y * activeW + x) * 4;
+      const alpha = d[i + 3];
+      const gray = d[i] * 0.299 + d[i+1] * 0.587 + d[i+2] * 0.114;
+      let isSubject = hasAlpha ? alpha > 128 : gray < (darkPixels > totalPixels * 0.5 ? 180 : 200);
+      if (isSubject) {
         if (x < minX) minX = x; if (y < minY) minY = y;
         if (x > maxX) maxX = x; if (y > maxY) maxY = y;
       }
     }
   }
+  
+  if (minX >= maxX || minY >= maxY) {
+    minX = 0; minY = 0;
+    maxX = activeW - 1; maxY = activeH - 1;
+  }
+  
   minX = Math.max(0, minX - cropMargin); minY = Math.max(0, minY - cropMargin);
   maxX = Math.min(activeW - 1, maxX + cropMargin); maxY = Math.min(activeH - 1, maxY + cropMargin);
   const cropW = maxX - minX + 1, cropH = maxY - minY + 1;
